@@ -1,5 +1,16 @@
 <?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // CAPTCHA Verification
+    $recaptcha_secret = 'your-secret-key'; // Replace with your Secret Key
+    $recaptcha_response = $_POST['g-recaptcha-response'];
+    
+    $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$recaptcha_secret&response=$recaptcha_response");
+    $response_keys = json_decode($response, true);
+    
+    if (intval($response_keys["success"]) !== 1) {
+        die("CAPTCHA verification failed. Please try again.");
+    }
+
     // Sanitize and validate input
     $name = filter_var(trim($_POST["name"]), FILTER_SANITIZE_STRING);
     $email = filter_var(trim($_POST["email"]), FILTER_SANITIZE_EMAIL);
